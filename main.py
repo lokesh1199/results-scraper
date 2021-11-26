@@ -1,7 +1,7 @@
 import re
 
-from bs4 import BeautifulSoup
 import requests
+from bs4 import BeautifulSoup
 
 
 def getCookies(resultsLink):
@@ -38,6 +38,10 @@ def convertToCSV(content):
             res.append(tmp)
 
     res = [','.join(row) for row in res]
+
+    if len(res) == 2:
+        raise Exception('No Results Found')
+
     return res
 
 
@@ -45,19 +49,43 @@ def generateCSV(rollNos, link, filename):
     cookies = getCookies(link)
     with open(filename, 'w') as f:
         for rollNo in rollNos:
-            for row in convertToCSV(getResultsPage(rollNo, cookies[0], *cookies[1])):
-                f.write(row + '\n')
             print(rollNo + '\r', end='', flush=False)
+            try:
+                for row in convertToCSV(getResultsPage(rollNo, cookies[0], *cookies[1])):
+                    f.write(row + '\n')
+            except:
+                continue
             f.write('\n'*3)
 
 
+def generateRollNos(start, end):
+    base = start[:-2]
+    start = start[-2:]
+    end = end[-2:]
+
+    while start <= end:
+        yield base+start
+        unitsPlace = (int(start[-1]) + 1) % 10
+        tensPlace = start[0]
+        if unitsPlace == 0:
+            if tensPlace.isalpha():
+                tensPlace = chr(ord(tensPlace) + 1)
+            else:
+                tensPlace = (int(tensPlace) + 1) % 10
+                if tensPlace == 0:
+                    # 99 -> A0
+                    tensPlace = 'A'
+        start = str(tensPlace) + str(unitsPlace)
+
+
+def main():
+    link = input('Enter results link: ')
+    start = input('Enter starting roll number: ').upper()
+    end = input('Enter ending roll no: ').upper()
+
+    rollNos = generateRollNos(start, end)
+    generateCSV(rollNos, link, 'results.csv')
+
+
 if __name__ == '__main__':
-    rollNos = [
-        '19bf1a05e1',
-        '19bf1a05e2',
-        '19bf1a05e3',
-        '19bf1a05e4',
-        '19bf1a05e5',
-    ]
-    generateCSV(
-        rollNos, 'https://jntuaresults.ac.in/view-results-56736469.html', 'results.csv')
+    main()
