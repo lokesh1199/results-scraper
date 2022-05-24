@@ -80,9 +80,9 @@ def generateRollNos(start, end):
 
 
 def main():
-    link = input('Enter results link: ')
-    start = input('Enter starting roll number: ').upper()
-    end = input('Enter ending roll no: ').upper()
+    link = input('Enter results link: ').strip()
+    start = input('Enter starting roll number: ').strip().upper()
+    end = input('Enter ending roll no: ').strip().upper()
 
     rollNos = generateRollNos(start, end)
     generateCSV(rollNos, link, 'results.csv')
