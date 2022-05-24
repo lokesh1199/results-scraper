@@ -53,7 +53,8 @@ def generateCSV(rollNos, link, filename):
             try:
                 for row in convertToCSV(getResultsPage(rollNo, cookies[0], *cookies[1])):
                     f.write(row + '\n')
-            except:
+            except Exception as e:
+                print(e)
                 continue
             f.write('\n'*3)
 
