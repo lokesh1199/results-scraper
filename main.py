@@ -18,8 +18,8 @@ def getCookies(resultsLink):
 
 
 def getResultsPage(rollNo, session, baseLink, id, accessToken):
-    baseLink = ('https://jntuaresults.ac.in/' + baseLink + rollNo + '&id='
-                + id + '&accessToken=' + accessToken)
+    baseLink = ('https://jntuaresults.ac.in/' + baseLink + rollNo + '&id=' +
+                id + '&accessToken=' + accessToken)
 
     res = session.get(baseLink)
     return res.text
@@ -30,7 +30,8 @@ def convertToCSV(content):
 
     res = [
         [elem.next_sibling.text.strip() for elem in soup.findAll('b')],
-        [elem.text.strip() for elem in soup.findAll('th') if elem.text]]
+        [elem.text.strip() for elem in soup.findAll('th') if elem.text],
+    ]
 
     for elem in soup.findAll('tr'):
         tmp = []
@@ -59,12 +60,17 @@ def generateCSV(rollNos, link, filename):
         for rollNo in rollNos:
             print(rollNo + '\r', end='', flush=False)
             try:
-                for row in convertToCSV(getResultsPage(rollNo, cookies[0], *cookies[1])):
+                for row in convertToCSV(
+                        getResultsPage(
+                            rollNo,
+                            cookies[0],
+                            *cookies[1],
+                        )):
                     f.write(row + '\n')
             except Exception as e:
                 print(e)
                 continue
-            f.write('\n'*3)
+            f.write('\n' * 3)
 
 
 def generateRollNos(start, end):
@@ -73,7 +79,7 @@ def generateRollNos(start, end):
     end = end[-2:]
 
     while start <= end:
-        yield base+start
+        yield base + start
         unitsPlace = (int(start[-1]) + 1) % 10
         tensPlace = start[0]
         if unitsPlace == 0:
