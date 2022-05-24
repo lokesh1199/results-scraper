@@ -11,6 +11,9 @@ def getCookies(resultsLink):
     reg = re.compile(r'xmlhttp.open\("GET","(.+?)".+?"\+(.+?)\+.+?\+(.+?),')
     matches = reg.search(res.text)
 
+    if matches is None:
+        raise Exception('Results page not working')
+
     return session, matches.groups('1:4')
 
 
@@ -46,7 +49,12 @@ def convertToCSV(content):
 
 
 def generateCSV(rollNos, link, filename):
-    cookies = getCookies(link)
+    try:
+        cookies = getCookies(link)
+    except Exception as e:
+        print(e)
+        return
+
     with open(filename, 'w') as f:
         for rollNo in rollNos:
             print(rollNo + '\r', end='', flush=False)
